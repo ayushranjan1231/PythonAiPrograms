@@ -1,0 +1,61 @@
+# Define fuzzy set operations
+def fuzzy_union(set1, set2):
+    return {x: max(set1.get(x, 0), set2.get(x, 0)) for x in set(set1) | set(set2)}
+
+def fuzzy_intersection(set1, set2):
+    return {x: min(set1.get(x, 0), set2.get(x, 0)) for x in set(set1) | set(set2)}
+
+def fuzzy_complement(fuzzy_set):
+    return {x: 1 - membership for x, membership in fuzzy_set.items()}
+
+# Function to input fuzzy set from user
+def input_fuzzy_set(name):
+    fuzzy_set = {}
+    n = int(input(f"Enter number of elements in {name}: "))
+    for _ in range(n):
+        element = input("  Enter element name: ")
+        membership = float(input(f"  Enter membership value for {element} (between 0 and 1): "))
+        fuzzy_set[element] = membership
+    return fuzzy_set
+
+# Function to display fuzzy set
+def display_set(name, fuzzy_set):
+    print(f"{name}:")
+    for elem, val in fuzzy_set.items():
+        print(f"  {elem}: {val}")
+    print()
+
+# --- Main program starts here ---
+
+# Take input for 3 fuzzy sets
+print("Input Fuzzy Set A")
+A = input_fuzzy_set("A")
+
+print("\nInput Fuzzy Set B")
+B = input_fuzzy_set("B")
+
+print("\nInput Fuzzy Set C")
+C = input_fuzzy_set("C")
+
+# Perform operations
+union_AB = fuzzy_union(A, B)
+intersection_AB = fuzzy_intersection(A, B)
+complement_A = fuzzy_complement(A)
+
+union_BC = fuzzy_union(B, C)
+intersection_BC = fuzzy_intersection(B, C)
+complement_C = fuzzy_complement(C)
+
+# Display results
+print("\n--- Results ---\n")
+display_set("Fuzzy Set A", A)
+display_set("Fuzzy Set B", B)
+display_set("Fuzzy Set C", C)
+
+display_set("A ∪ B", union_AB)
+display_set("A ∩ B", intersection_AB)
+display_set("¬A", complement_A)
+
+display_set("B ∪ C", union_BC)
+display_set("B ∩ C", intersection_BC)
+display_set("¬C", complement_C)
