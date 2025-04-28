@@ -1,0 +1,95 @@
+import numpy as np
+
+# Sigmoid activation function
+def sigmoid(x):
+    return 1 / (1 + np.exp(-x))
+
+# Derivative of Sigmoid activation
+def sigmoid_derivative(x):
+    return x * (1 - x)
+
+# Function to train the MLP
+def train_mlp(inputs, outputs, input_size, hidden_size1, hidden_size2, output_size, learning_rate=0.1, epochs=10000):
+    np.random.seed(1)  # For reproducibility
+
+    # Initialize weights and biases
+    w1 = np.random.randn(input_size, hidden_size1)
+    b1 = np.random.randn(hidden_size1)
+
+    w2 = np.random.randn(hidden_size1, hidden_size2)
+    b2 = np.random.randn(hidden_size2)
+
+    w3 = np.random.randn(hidden_size2, output_size)
+    b3 = np.random.randn(output_size)
+
+    # Training process
+    for epoch in range(epochs):
+        # ---- Forward Pass ----
+        z1 = np.dot(inputs, w1) + b1
+        a1 = sigmoid(z1)
+
+        z2 = np.dot(a1, w2) + b2
+        a2 = sigmoid(z2)
+
+        z3 = np.dot(a2, w3) + b3
+        output = sigmoid(z3)
+
+        # ---- Compute Error ----
+        error = outputs - output
+        if (epoch + 1) % 1000 == 0:
+            print(f"Epoch {epoch + 1}, Error: {np.mean(np.abs(error)):.6f}")
+
+        # ---- Backpropagation ----
+        output_delta = error * sigmoid_derivative(output)
+        a2_delta = output_delta.dot(w3.T) * sigmoid_derivative(a2)
+        a1_delta = a2_delta.dot(w2.T) * sigmoid_derivative(a1)
+
+        # ---- Update Weights and Biases ----
+        w3 += a2.T.dot(output_delta) * learning_rate
+        b3 += np.sum(output_delta, axis=0) * learning_rate
+
+        w2 += a1.T.dot(a2_delta) * learning_rate
+        b2 += np.sum(a2_delta, axis=0) * learning_rate
+
+        w1 += inputs.T.dot(a1_delta) * learning_rate
+        b1 += np.sum(a1_delta, axis=0) * learning_rate
+
+    # Display final weights and biases
+    print("\nFinal weights and biases:")
+    print("Weights Input -> Hidden1 (w1):\n", w1)
+    print("Biases Hidden1 (b1):\n", b1)
+    print("Weights Hidden1 -> Hidden2 (w2):\n", w2)
+    print("Biases Hidden2 (b2):\n", b2)
+    print("Weights Hidden2 -> Output (w3):\n", w3)
+    print("Biases Output (b3):\n", b3)
+    print("\nTraining complete.")
+
+# Example usage
+if __name__ == "__main__":
+    # 4 binary inputs
+    inputs = np.array([
+        [0, 0, 0, 0], [0, 0, 0, 1],
+        [0, 0, 1, 0], [0, 0, 1, 1],
+        [0, 1, 0, 0], [0, 1, 0, 1],
+        [0, 1, 1, 0], [0, 1, 1, 1],
+        [1, 0, 0, 0], [1, 0, 0, 1],
+        [1, 0, 1, 0], [1, 0, 1, 1],
+        [1, 1, 0, 0], [1, 1, 0, 1],
+        [1, 1, 1, 0], [1, 1, 1, 1]
+    ])
+
+    # 1 output per input
+    outputs = np.array([
+        [0], [1], [1], [0],
+        [1], [0], [0], [1],
+        [0], [1], [1], [0],
+        [1], [0], [0], [1]
+    ])
+
+    input_size = inputs.shape[1]     # 4 inputs
+    hidden_size1 = 4                 # First hidden layer size
+    hidden_size2 = 4                 # Second hidden layer size
+    output_size = outputs.shape[1]   # 1 output
+
+    # Train the MLP
+    train_mlp(inputs, outputs, input_size, hidden_size1, hidden_size2, output_size)
