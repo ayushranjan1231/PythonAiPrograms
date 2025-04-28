@@ -1,0 +1,80 @@
+import numpy as np
+
+# Binary Step Activation Function
+def binary_step(x):
+    return np.where(x >= 0, 1, 0)
+
+# Derivative of Binary Step Function
+def binary_step_derivative(x):
+    # Derivative is zero almost everywhere; not useful for backprop
+    # To proceed, we approximate it similar to sigmoid derivative
+    return np.ones_like(x)
+
+# Function to train the MLP
+def train_mlp(inputs, outputs, input_size, hidden_size, output_size, learning_rate=0.1, epochs=10000):
+    np.random.seed(1)
+
+    # Initialize weights and biases randomly
+    w1 = np.random.randn(input_size, hidden_size)
+    b1 = np.random.randn(hidden_size)
+    w2 = np.random.randn(hidden_size, output_size)
+    b2 = np.random.randn(output_size)
+
+    step_count = 0  # Count the number of updates (steps)
+
+    # Training process
+    for epoch in range(epochs):
+        # Forward pass
+        z1 = np.dot(inputs, w1) + b1
+        a1 = binary_step(z1)  # Use Binary Activation
+
+        z2 = np.dot(a1, w2) + b2
+        output = binary_step(z2)  # Use Binary Activation
+
+        # Calculate error
+        error = outputs - output
+
+        # Backpropagation (approximate because binary step has no proper gradient)
+        output_delta = error * binary_step_derivative(output)
+        a1_delta = output_delta.dot(w2.T) * binary_step_derivative(a1)
+
+        # Update weights and biases
+        w2 += a1.T.dot(output_delta) * learning_rate
+        b2 += np.sum(output_delta, axis=0) * learning_rate
+        w1 += inputs.T.dot(a1_delta) * learning_rate
+        b1 += np.sum(a1_delta, axis=0) * learning_rate
+
+        step_count += 1
+
+        # Print error every 1000 epochs
+        if (epoch + 1) % 1000 == 0:
+            print(f"Epoch {epoch + 1}, Mean Error: {np.mean(np.abs(error))}")
+
+    # Final results
+    print("\nFinal Weights and Biases:")
+    print("Weights between input and hidden layer (w1):\n", w1)
+    print("Biases of hidden layer (b1):\n", b1)
+    print("Weights between hidden and output layer (w2):\n", w2)
+    print("Biases of output layer (b2):\n", b2)
+
+    print("\nTraining Complete.")
+    print(f"\nTotal Number of Steps: {step_count}")
+
+# Main Program
+if __name__ == "__main__":
+    # Inputs (4 binary features)
+    inputs = np.array([[0, 0, 0, 0], [0, 0, 0, 1], [0, 0, 1, 0], [0, 0, 1, 1],
+                       [0, 1, 0, 0], [0, 1, 0, 1], [0, 1, 1, 0], [0, 1, 1, 1],
+                       [1, 0, 0, 0], [1, 0, 0, 1], [1, 0, 1, 0], [1, 0, 1, 1],
+                       [1, 1, 0, 0], [1, 1, 0, 1], [1, 1, 1, 0], [1, 1, 1, 1]])
+
+    # Outputs (2 binary outputs)
+    outputs = np.array([[0, 0], [0, 1], [0, 1], [0, 0], [1, 0], [1, 0], [1, 1], [1, 1],
+                        [0, 1], [0, 0], [1, 1], [1, 0], [0, 1], [0, 1], [1, 0], [1, 1]])
+
+    input_size = inputs.shape[1]   # 4 inputs
+    hidden_size = 4                # 4 neurons in hidden layer
+    output_size = outputs.shape[1] # 2 outputs
+
+    # Train the MLP
+    train_mlp(inputs, outputs, input_size, hidden_size, output_size)
