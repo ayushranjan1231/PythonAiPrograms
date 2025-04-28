@@ -1,0 +1,103 @@
+'''
+Program 13:
+Implement Fuzzy set operations – union, intersection and complement.
+Demonstrate De Morgan’s Law (Complement of Union) with 2 fuzzy sets.
+'''
+
+# Define fuzzy set operations
+def fuzzy_union(set1, set2):
+    return {x: max(set1.get(x, 0), set2.get(x, 0)) for x in set(set1) | set(set2)}
+
+def fuzzy_intersection(set1, set2):
+    return {x: min(set1.get(x, 0), set2.get(x, 0)) for x in set(set1) | set(set2)}
+
+def fuzzy_complement(fuzzy_set):
+    return {x: 1 - membership for x, membership in fuzzy_set.items()}
+
+# Function to input fuzzy set from user
+def input_fuzzy_set(name):
+    fuzzy_set = {}
+    n = int(input(f"Enter number of elements in {name}: "))
+    for _ in range(n):
+        element = input("  Enter element name: ")
+        membership = float(input(f"  Enter membership value for {element} (between 0 and 1): "))
+        fuzzy_set[element] = membership
+    return fuzzy_set
+
+# Function to display fuzzy set
+def display_set(name, fuzzy_set):
+    print(f"{name}:")
+    for elem, val in fuzzy_set.items():
+        print(f"  {elem}: {val}")
+    print()
+
+# --- Main Program for Program 13 ---
+
+# Input fuzzy sets
+print("Input Fuzzy Set A")
+A = input_fuzzy_set("A")
+
+print("\nInput Fuzzy Set B")
+B = input_fuzzy_set("B")
+
+# Fuzzy set operations
+union_AB = fuzzy_union(A, B)
+intersection_AB = fuzzy_intersection(A, B)
+complement_A = fuzzy_complement(A)
+complement_B = fuzzy_complement(B)
+
+# De Morgan's Law: Complement of the Union = Intersection of Complements
+complement_union_AB = fuzzy_complement(union_AB)
+intersection_complements = fuzzy_intersection(complement_A, complement_B)
+
+# Display results
+print("\n--- Results for Program 13 ---\n")
+display_set("Fuzzy Set A", A)
+display_set("Fuzzy Set B", B)
+
+display_set("A ∪ B", union_AB)
+display_set("A ∩ B", intersection_AB)
+display_set("¬A", complement_A)
+display_set("¬B", complement_B)
+
+display_set("¬(A ∪ B)", complement_union_AB)
+display_set("¬A ∩ ¬B", intersection_complements)
+
+# Check De Morgan's Law
+print("De Morgan's Law for Complement of Union:")
+print(f"¬(A ∪ B) == ¬A ∩ ¬B: {complement_union_AB == intersection_complements}")
+
+
+
+'''
+Program 14:
+Implement Fuzzy set operations – union, intersection and complement.
+Demonstrate De Morgan’s Law (Complement of Intersection) with 2 fuzzy sets.
+'''
+
+# (Note: Re-using same fuzzy sets A and B input earlier)
+
+# Fuzzy set operations
+intersection_AB = fuzzy_intersection(A, B)
+complement_intersection_AB = fuzzy_complement(intersection_AB)
+
+complement_A = fuzzy_complement(A)
+complement_B = fuzzy_complement(B)
+union_complements_AB = fuzzy_union(complement_A, complement_B)
+
+# Display results
+print("\n--- Results for Program 14 ---\n")
+display_set("Fuzzy Set A", A)
+display_set("Fuzzy Set B", B)
+
+display_set("A ∩ B", intersection_AB)
+display_set("¬(A ∩ B)", complement_intersection_AB)
+
+display_set("¬A", complement_A)
+display_set("¬B", complement_B)
+
+display_set("¬A ∪ ¬B", union_complements_AB)
+
+# Check De Morgan's Law
+print("De Morgan's Law for Complement of Intersection:")
+print(f"¬(A ∩ B) == ¬A ∪ ¬B: {complement_intersection_AB == union_complements_AB}")
